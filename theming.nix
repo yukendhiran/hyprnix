@@ -10,6 +10,8 @@
   font-awesome
   material-design-icons
   qogir-theme
+  comic-relief
+  google-fonts
   papirus-icon-theme
   qogir-icon-theme
   whitesur-icon-theme

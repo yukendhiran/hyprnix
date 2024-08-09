@@ -1,20 +1,73 @@
 { config, pkgs, lib, ... }:
 
 {
+
+#=================IMPORTS===============================
   imports =
-    [ 
+    [ #check -> https://github.com/NixOS/nixos-hardware
+      #better hardware-support from nix-os
+      <nixos-hardware/dell/latitude/3480>
       ./hardware-configuration.nix
     ];
+#================FILESYSTEM-SUPPORT=====================
 
+  # NTFS Support
+   boot.supportedFilesystems = [ "ntfs" ];
+
+#==================BOOT=================================
   boot = {
-    loader.grub = {
-      enable = true;
-      device = "/dev/sda";
-      useOSProber = true;
-      configurationLimit = lib.mkDefault 5;
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
     };
-    extraModprobeConfig = "options kvm_intel nested=1";
+    # xanmod is a custom kernel
+    kernelPackages = pkgs.linuxPackages_xanmod_latest;
+    kernelParams = [ "intel_pstate=active" ];
+
+    initrd.kernelModules = [ "i915" ];  
+    kernelModules = [ "kvm-intel" ];
+    
   };
+
+#=====================ZRAM===================================
+  #zram is a compression mechanism used to free up some RAM when its required
+  #SWAP Partition is copying RAM Content to disk(SWAP) and ZRAM is compression happen within RAM
+  #This is what i remember, sorry if wrong 
+  zramSwap.enable = true;
+  #zstd is algorithm used for compression
+  zramSwap.algorithm = "zstd";
+
+#=======================DRIVERS===========================
+  # Video Drivers # I have intel fn
+  services.xserver.videoDrivers = [
+    "i915"
+    "intel"
+  ];
+
+  hardware = {
+    # Micro Code Updates
+    cpu.intel.updateMicrocode = true;
+
+    enableAllFirmware = true;
+    #propriority driver
+    enableRedistributableFirmware = true;
+  };
+
+
+  # Fwupd # Firmware updater 
+  services.fwupd = {
+    enable = true;
+  };
+
+#=======================================================
+
+  # Dconf
+  programs.dconf.enable = true;
+  
+  # Dbus
+  services.dbus.enable = true;
+
+#===================NETWORK=============================
 
   networking = {
     hostName = "nixos";
@@ -35,9 +88,44 @@
     # };
   }; 
 
-  time.timeZone = "Africa/Johannesburg";
-  i18n.defaultLocale = "en_GB.UTF-8";
+#=======================TIME============================
+  # Set your time zone.
+  time.timeZone = "Asia/Kolkata";
 
+  # Select internationalisation properties.
+  i18n.defaultLocale = "en_IN";
+
+    i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_IN";
+    LC_IDENTIFICATION = "en_IN";
+    LC_MEASUREMENT = "en_IN";
+    LC_MONETARY = "en_IN";
+    LC_NAME = "en_IN";
+    LC_NUMERIC = "en_IN";
+    LC_PAPER = "en_IN";
+    LC_TELEPHONE = "en_IN";
+    LC_TIME = "en_IN";
+  };
+
+#====================BLUETOOTH==============================
+
+  hardware = {
+    bluetooth ={
+      enable = true;
+      powerOnBoot = true;
+    }
+  }
+
+  services.blueman.enable = true;
+
+  systemd.user.services.mpris-proxy = {
+    description = "Mpris proxy";
+    after = [ "network.target" "sound.target" ];
+    wantedBy = [ "default.target" ];
+    serviceConfig.ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
+  };
+
+#===================SERVICES============================
   services = { 
     xserver = {
       layout = "us";
@@ -70,22 +158,76 @@
     dbus.packages = [ pkgs.gcr ];
     udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
     gnome.gnome-keyring.enable = true;
+    
+    # Enable CUPS to print documents.
+    printing.enable = true;
+    # Touchpad Support
+    libinput.enable = true;
+
   };
+#=============VIDEO-ACCELERATION==========================
+  nixpkgs.config.packageOverrides = pkgs: {
+    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+  };
+
+  hardware.opengl = {
+    driSupport = true; 
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver # LIBVA_DRIVER_NAME=iHD
+      intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+      libvdpau-va-gl
+    ];
+  };
+
+  environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
+
+#===============CPU-AND-POWER=============================
+
+  # Better scheduling for CPU cycles - thanks System76!!!
+  services.system76-scheduler.settings.cfsProfiles.enable = true;
+
+  # Enable TLP (better than gnomes internal power manager)
+  services.tlp = {
+    enable = true;
+    settings = {
+      CPU_BOOST_ON_AC = 1;
+      CPU_BOOST_ON_BAT = 0;
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+    };
+  };
+
+  # Disable GNOMEs power management
+  services.power-profiles-daemon.enable = false;
+
+  # Enable powertop
+  powerManagement.powertop.enable = true;
+
+  # Enable thermald (only necessary if on Intel CPUs)
+  services.thermald.enable = true;
+
+#============USER=====================================
   
-  users.users.mbhon1 = {
+  users.users.yukendhiran = {
     isNormalUser = true;
-    description = "Mbhon1";
+    description = "yukendhiran";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
+
+  # services Accounts
+  services.accounts-daemon.enable = true;
+
+#=================UNFREE================================
 
   nixpkgs = {
     config = {
      allowUnfree = lib.mkForce true;
      permittedInsecurePackages = [ 
      	"electron-19.1.9"
-	"mailspring-1.11.0"
+	    "mailspring-1.11.0"
      ];
     };
     overlays = [
@@ -95,11 +237,13 @@
     ];
   };
 
+#================SYSTEM=================================
+
   nix = { 
     gc = {
       automatic = lib.mkDefault true;
       dates = lib.mkDefault "weekly";
-      options = lib.mkDefault "--delete-older-than 1w";
+      options = lib.mkDefault "--delete-older-than 2w";
     };
     settings = {
       auto-optimise-store = true;
@@ -108,6 +252,14 @@
     };
   };
   
+#================ALLOW-NON-NIX-BINARY======================
+
+  #enable nixid for normal binary to work
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = [];
+  # example to run codeium inside your vscode you need this, Codeium is open source github copilot alternative
+#================PACKAGES===============================
+
   environment = {
     systemPackages = with pkgs; [
       home-manager
@@ -153,6 +305,11 @@
    };
   };
 
+  # force the service to use wayland
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+  };
+
   sound.enable = true;
   hardware.pulseaudio.enable = false;
 
@@ -163,30 +320,36 @@
 
   xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
+    extraPortals = with pkgs; [ 
+      xdg-desktop-portal-gtk 
+      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-wlr
+    ];
   };
 
-  virtualisation = {
-    libvirtd = {
-      enable = true;
-      qemu.runAsRoot = true;
-        extraConfig = ''
-        unix_sock_group = "libvirtd"
-        unix_sock_rw_perms = "0770"
-      '';
-    };
-    virtualbox = {
-      host = {
-        enable= true;
-        enableExtensionPack = true;
-      };
-      guest = {
-        enable = true;
-	      x11 = true;
-      };
-    };
-  };
-  
+#==================VIRTUALIZATION=======================
+#
+#  virtualisation = {
+#    libvirtd = {
+#      enable = true;
+#      qemu.runAsRoot = true;
+#        extraConfig = ''
+#        unix_sock_group = "libvirtd"
+#        unix_sock_rw_perms = "0770"
+#      '';
+#    };
+#    virtualbox = {
+#      host = {
+#        enable= true;
+#        enableExtensionPack = true;
+#      };
+#      guest = {
+#        enable = true;
+#	      x11 = true;
+#      };
+#    };
+#  };
+#=====================KERRING===========================
   systemd = {
     user.services.polkit-gnome-authentication-agent-1 = {
        description = "polkit-gnome-authentication-agent-1";
@@ -206,5 +369,11 @@
     '';
   };
 
-  system.stateVersion = "23.05"; 
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It‘s perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "24.05"; # Did you read the comment?
 }
