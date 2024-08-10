@@ -1,5 +1,5 @@
 {
-  description = "Home manager Configuration for Mbhon1's Flake.";
+  description = "Home manager Configuration for Yuki's Flake.";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -53,20 +53,20 @@
         specialArgs = { inherit inputs; };
         system = "x86_64-linux";
         modules = [ 
-        /home/mbhon1/.config/nixos/configuration.nix
+        /home/yukendhiran/.config/nixos/configuration.nix
         flatpaks.homeManagerModules.default
         home-manager.nixosModules.home-manager
         {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.mbhon1 = import ./home.nix;
+            home-manager.users.yukendhiran = import ./home.nix;
           }
         ];
       };
     };
 
     homeConfigurations = {
-      "mbhon1" = home-manager.lib.homeManagerConfiguration {
+      "yukendhiran" = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.x86_64-linux; 
         extraSpecialArgs = { inherit spicetify-nix; }; 
         modules = [ 

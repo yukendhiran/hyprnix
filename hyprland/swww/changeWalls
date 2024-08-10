@@ -1,7 +1,7 @@
 ''
 #!/usr/bin/env bash
 
-DIR=$HOME/Pictures/swww-walls/
+DIR=$HOME/.wallpapers/
 PICS=($(ls ${DIR}))
 
 RANDOMPICS=${PICS[ $RANDOM % ${#PICS[@]} ]}

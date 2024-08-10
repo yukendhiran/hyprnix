@@ -9,7 +9,7 @@
 
         swww daemon &
         swww init & 
-        swww img ~/Pictures/swww-walls/W14_Car_Studio_2.jpg &
+        swww img ~/.wallpapers/me.png &
         '';
   };
 

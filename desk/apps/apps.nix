@@ -13,7 +13,6 @@
     mysql84
     mysql-workbench
     obs-studio
-    mpv
     logseq
     aria2
     wezterm

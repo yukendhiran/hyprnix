@@ -1,8 +1,12 @@
 {pkgs, config, lib, inputs, ...}: 
 {
   wayland.windowManager.hyprland.extraConfig = ''
-    monitor = DP-1, 1440x900@59, 0x0, 1
+    #monitor = DP-1, 1440x900@59, 0x0, 1
     # monitor = DP-1, 1024x768@59, 0x0, 1
+    # monitor = DP-1,1366x768@60,0x0,1
+    monitor = ,preferred,auto,auto
+    
+
 
     # Start up apps on boot
     exec-once = /usr/libexec/polkit-gnome-authentication-agent-1
@@ -30,7 +34,7 @@
 
     input {
       kb_layout = us
-      kb_model = pc104
+      #kb_model = pc104
       follow_mouse = 1
       touchpad {
         natural_scroll = yes
@@ -49,12 +53,13 @@
     }
 
     master {
-      new_is_master = false
+      new_status = master
       # no_gaps_when_only = yes
     }
 
     gestures {
       workspace_swipe = on
+      workspace_swipe_fingers = 3
     }
 
     # Theme
@@ -151,7 +156,7 @@
 
     # Launchers
     bind = SUPER, Return, exec, kitty
-    bind = SUPER, W, exec, brave
+    bind = SUPER, W, exec, floorp
     bind = SUPER, E, exec, nautilus
     bind = SUPER, C, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy
     bind = ALT, G, exec, rofi -modi emoji -show emoji
@@ -163,20 +168,20 @@
     # Bindings
     bind = CTRL ALT, Delete, exit
     bind = SUPER, Q, killactive
-    bind = SUPER, F, togglefloating
-    bind = SUPER, G, fullscreen
+    bind = SUPER, Space, togglefloating
+    bind = SUPER, F, fullscreen
     bind = SUPER, O, fakefullscreen
-    bind = SUPER, P, togglesplit
+    bind = SUPER, S, togglesplit
 
     # Move focus with mainMod + arrow keys
-    bind = SUPER, k, movefocus, u
-    bind = SUPER, j, movefocus, d
-    bind = SUPER, l, movefocus, r
-    bind = SUPER, h, movefocus, l
+    bind = SUPER, left, movefocus, l
+    bind = SUPER, right, movefocus, r
+    bind = SUPER, up, movefocus, u
+    bind = SUPER, down, movefocus, d
 
     # Switch workspaces with mainMod + [0-9]
-    bind = SUPER, left,  workspace, e-1
-    bind = SUPER, right, workspace, e+1
+    bind = SUPER, period, workspace, e+1
+    bind = SUPER, comma, workspace,e-1
     bind = SUPER, 1, workspace, 1
     bind = SUPER, 2, workspace, 2
     bind = SUPER, 3, workspace, 3
@@ -188,27 +193,41 @@
     bind = SUPER, 9, workspace, 9
 
     # Window
-    binde = SUPER CTRL, k, resizeactive, 0 -20
-    binde = SUPER CTRL, j, resizeactive, 0 20
-    binde = SUPER CTRL, l, resizeactive, 20 0
-    binde = SUPER CTRL, h, resizeactive, -20 0
-    binde = SUPER ALT,  k, moveactive, 0 -20
-    binde = SUPER ALT,  j, moveactive, 0 20
-    binde = SUPER ALT,  l, moveactive, 20 0
-    binde = SUPER ALT,  h, moveactive, -20 0
+    bind =,right,resizeactive,15 0
+    bind =,left,resizeactive,-15 0
+    bind =,up,resizeactive,0 -15
+    bind =,down,resizeactive,0 15
+  #  bind = SUPER ALT,  k, moveactive, 0 -20
+  #  bind = SUPER ALT,  j, moveactive, 0 20
+  #  bind = SUPER ALT,  l, moveactive, 20 0
+  #  bind = SUPER ALT,  h, moveactive, -20 0
 
-    # Move active window to workspace
-    bind = SUPER SHIFT, right, movetoworkspace, e+1
-    bind = SUPER SHIFT, left,  movetoworkspace, e-1
-    bind = SUPER SHIFT, 1, movetoworkspace, 1
-    bind = SUPER SHIFT, 2, movetoworkspace, 2
-    bind = SUPER SHIFT, 3, movetoworkspace, 3
-    bind = SUPER SHIFT, 4, movetoworkspace, 4
-    bind = SUPER SHIFT, 5, movetoworkspace, 5
-    bind = SUPER SHIFT, 6, movetoworkspace, 6
-    bind = SUPER SHIFT, 7, movetoworkspace, 7
-    bind = SUPER SHIFT, 8, movetoworkspace, 8
-    bind = SUPER SHIFT, 9, movetoworkspace, 9
+
+    # Move active window to a workspace with mainMod + CTRL + [0-9]
+    bind = SUPER CTRL, 1, movetoworkspace, 1
+    bind = SUPER CTRL, 2, movetoworkspace, 2
+    bind = SUPER CTRL, 3, movetoworkspace, 3
+    bind = SUPER CTRL, 4, movetoworkspace, 4
+    bind = SUPER CTRL, 5, movetoworkspace, 5
+    bind = SUPER CTRL, 6, movetoworkspace, 6
+    bind = SUPER CTRL, 7, movetoworkspace, 7
+    bind = SUPER CTRL, 8, movetoworkspace, 8
+    bind = SUPER CTRL, 9, movetoworkspace, 9
+    bind = SUPER CTRL, 0, movetoworkspace, 10
+    bind = SUPER CTRL, left, movetoworkspace, -1
+    bind = SUPER CTRL, right, movetoworkspace, +1
+
+    # same as above, but doesnt switch to the workspace
+    bind = $mainMod SHIFT, 1, movetoworkspacesilent, 1
+    bind = $mainMod SHIFT, 2, movetoworkspacesilent, 2
+    bind = $mainMod SHIFT, 3, movetoworkspacesilent, 3
+    bind = $mainMod SHIFT, 4, movetoworkspacesilent, 4
+    bind = $mainMod SHIFT, 5, movetoworkspacesilent, 5
+    bind = $mainMod SHIFT, 6, movetoworkspacesilent, 6
+    bind = $mainMod SHIFT, 7, movetoworkspacesilent, 7
+    bind = $mainMod SHIFT, 8, movetoworkspacesilent, 8
+    bind = $mainMod SHIFT, 9, movetoworkspacesilent, 9
+    bind = $mainMod SHIFT, 0, movetoworkspacesilent, 10
 
     # Move/resize windows with mainMod + LMB/RMB and dragging
     bindm = SUPER, mouse:272, movewindow

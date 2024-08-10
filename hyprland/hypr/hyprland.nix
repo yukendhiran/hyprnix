@@ -10,15 +10,22 @@
     bat
     jq
     xdg-desktop-portal-hyprland
-    ffmpeg
+    ffmpeg-full
     spicetify-cli
     wl-gammactl 
     wl-clipboard
     wf-recorder
-    hyprpicker 
+    hyprpicker
+    hyprshot
+    lsd
+    hdrop
+    hyprnome 
     wayshot 
     imagemagick
-    pavucontrol 
+    pavucontrol
+    pamixer
+    alsa-utils
+    playerctl 
     brightnessctl
     socat
     xfce.thunar
@@ -40,6 +47,9 @@
     vulkan-tools
     glxinfo
     libva-utils
+    networkmanager
+    imagemagickBig
+    swappy
     xdg-utils
     xdg-user-dirs
     qt6.qtwayland

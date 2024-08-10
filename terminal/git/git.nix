@@ -4,12 +4,8 @@
   programs.git = {
     enable = true;
     lfs.enable = true;
-    userName = "Mbhon1";
-    userEmail = "mbhoni@proton.me";
-    signing = {
-      key = "EFD6080989EAFF1AFB2FC15CE1A2E447A9E91BB4";
-      signByDefault = true;
-    };
+    userName = "yukendhiran";
+    userEmail = "yukendhiran4@gmail.com";
     aliases = {
       st = "status";
       p = "pull";
