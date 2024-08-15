@@ -1,0 +1,185 @@
+{
+  "position": "bottom",
+  "layer": "top",
+  "height": 5,
+  "margin-top": 0,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "modules-left": ["backlight", "pulseaudio", "battery", "network"],
+  "modules-center": ["hyprland/workspaces"],
+  "modules-right": [
+    "tray",
+    "custom/playerctl",
+    "temperature",
+    "cpu",
+    "memory",
+    "disk",
+    "clock"
+  ],
+  "clock": {
+    "calendar": {
+      "format": {
+        "today": "<span color:'#b4befe'><b><u>{}</u></b></span>"
+      }
+    },
+    "format": "\uF017 {:%H:%M}",
+    "tooltip": true,
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format-alt": "\uF073 {:%d/%m}"
+  },
+  "hyprland/workspaces": {
+    "active-only": false,
+    "all-outputs": true,
+    "disable-scroll": false,
+    "on-scroll-up": "hyprctl dispatch workspace -1",
+    "on-scroll-down": "hyprctl dispatch workspace +1",
+    "format": "{icon}",
+    "on-click": "activate",
+    "format-icons": {
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六",
+      "7": "七",
+      "8": "八",
+      "9": "九",
+      "10": "十",
+      "urgent": "",
+      "active": "  ",
+      "default": "󰧞",
+      "sort-by-number": true
+    }
+  },
+
+  "temperature": {
+    // "thermal-zone": 1,
+    "interval": 4,
+    //"hwmon-path": "/sys/class/hwmon/hwmon3/temp1_input",
+    "critical-threshold": 80,
+    // "format-critical": " {temperatureC}°C",
+    "format-critical": "<span color=\"#b4befe\">{temperatureC}°C </span>",
+    "format": "<span color=\"#b4befe\">{temperatureC}°C </span>",
+    "format-icons": ["", "", ""],
+    "max-length": 7,
+    "min-length": 7,
+    "on-click": "xsensors"
+  },
+
+  "persistent-workspaces": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [],
+    "5": []
+  },
+
+  "memory": {
+    "format": " {}%",
+    "format-alt": " {used}/{total} GiB",
+    "interval": 5
+  },
+
+  "cpu": {
+    "format": " {usage}%",
+    "format-alt": " {avg_frequency} GHz",
+    "interval": 5
+  },
+
+  "disk": {
+    "format": "󰋊 {}%",
+    "format-alt": "󰋊 {used}/{total} GiB",
+    "interval": 5,
+    "path": "/mnt/Datos"
+  },
+
+  "network": {
+    "format-wifi": " {essid} ({signalStrength}%)",
+    "format-ethernet": "{ifname}: {ipaddr}/{cidr} ",
+    "format-linked": "{ifname} (No IP) ",
+    "format": " ",
+    "format-disconnected": " ",
+    "format-alt": "{ifname}: {ipaddr}/{cidr}",
+    "on-click": "wl-copy $(ip address show up scope global | grep inet | head -n1 | cut -d/ -f 1 | tr -d [:space:] | cut -c5-)",
+    "on-click-right": "nmtui",
+    "tooltip-format": " {bandwidthUpBits}  {bandwidthDownBits}\n{ifname}\n{ipaddr}/{cidr}\n",
+    "tooltip-format-wifi": " {essid} {frequency}MHz\nStrength: {signaldBm}dBm ({signalStrength}%)\nIP: {ipaddr}/{cidr}\n {bandwidthUpBits}  {bandwidthDownBits}",
+    "interval": 10
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 8
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "  {volume}%",
+    "format-icons": {
+      "default": [" "]
+    },
+    "scroll-step": 5,
+    "on-click": "pavucontrol"
+  },
+
+  "custom/playerctl": {
+    "format": "{icon}",
+    "return-type": "json",
+    "max-length": 64,
+    "exec": "playerctl -a metadata --format '{\"text\": \"{{artist}} - {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+    "on-click-middle": "playerctl play-pause",
+    "on-click": "playerctl previous",
+    "on-click-right": "playerctl next",
+    "format-icons": {
+      "Playing": "<span foreground='#E5B9C6'>󰒮 󰐌 󰒭</span>",
+      "Paused": "<span foreground='#928374'>󰒮 󰏥 󰒭</span>"
+    }
+  },
+
+  "battery": {
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "{icon}  {capacity}%",
+    "format-charging": "{capacity}% 󱐌",
+    "format-plugged": "{capacity}% 󱐌",
+    "format-alt": "{icon} {time}",
+    // "format-good": "", // An empty format will hide the module
+    // "format-full": "",
+    "format-icons": ["", "", "", "", ""]
+  },
+
+  "backlight": {
+    "device": "intel_backlight",
+    "format": "<span color=\"#b4befe\"> {icon} {percent}%</span>",
+    "format-alt": " {percent}% {icon}",
+    "format-alt-click": "click-right",
+
+    "format-icons": ["󰃜", "󰃛", "󰃚"],
+    "on-scroll-down": "brightnessctl s 5%-",
+    "on-scroll-up": "brightnessctl s +5%"
+  },
+
+  "custom/launcher": {
+    "format": "\uF0EC",
+    "on-click": "fuzzel",
+    "on-click-right": "wallpaper-picker",
+    "tooltip": "false"
+  },
+  "custom/notification": {
+    "tooltip": "false",
+    "format": "{icon} ",
+    "format-icons": {
+      "notification": "<span foreground:'red'><sup></sup></span>   ",
+      "none": "   ",
+      "dnd-notification": "<span foreground:'red'><sup></sup></span>   ",
+      "dnd-none": "   ",
+      "inhibited-notification": "<span foreground:'red'><sup></sup></span>   ",
+      "inhibited-none": "   ",
+      "dnd-inhibited-notification": "<span foreground:'red'><sup></sup></span>   ",
+      "dnd-inhibited-none": "   "
+    }
+  }
+}
