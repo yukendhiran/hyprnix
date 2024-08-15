@@ -1,7 +1,0 @@
-{
-  imports = [
-    ./hypr
-    ./swaylock
-    ./swww
-  ];
-}
