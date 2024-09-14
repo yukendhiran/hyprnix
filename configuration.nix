@@ -22,8 +22,9 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Which Kernel to use
-  boot.kernelPackages = pkgs.linuxPackages_zen;
-  
+  # boot.kernelPackages = pkgs.linuxPackages_zen;
+   boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
+
   boot.kernelParams = [
   "quiet"                                    # Reduce boot verbosity.
   "splash"                                   # Enable splash screen.
@@ -72,6 +73,10 @@
 
  fileSystems."/".options = [ "noatime" ];
 
+  #mtp
+  services.udev.packages = [ pkgs.android-udev-rules ];
+
+  services.gvfs.enable = true;
 
   # Enable CPU frequency scaling
   #powerManagement.cpuFreqGovernor = "performance";
@@ -257,8 +262,8 @@
       cat = "bat";
       
       # Useful Nix OS commands
-      edit = "sudo -E nvim /etc/nixos/configuration.nix";
-      edit-unstable = "sudo -E nvim /etc/nixos/unstable.nix";
+      edit = "sudo -E lvim /etc/nixos/configuration.nix";
+      edit-unstable = "sudo -E lvim /etc/nixos/unstable.nix";
       update = "sudo nix-channel --update && sudo nixos-rebuild switch";
 
       # Trashy
@@ -382,18 +387,32 @@
       google-fonts
   ];
 
+  nixpkgs.config.permittedInsecurePackages = [ "electron-27.3.11" ];
+
+  nixpkgs.overlays = [
+  (import (builtins.fetchTarball https://github.com/nix-community/emacs-overlay/archive/master.tar.gz))
+  ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
+    unrar
+    rar
+    p7zip
+    tangram
     curl
     ventoy
     firefoxpwa
     lunarvim
-    ripgrep
-    zed-editor
+    teams-for-linux
+    qbittorrent
+    libutp
+    ytdownloader
+    vuze
+    devbox
+    #zed-editor
     firefox-devedition
     mysql84
     mysql-workbench
@@ -405,7 +424,7 @@
     fish
     zsh
     wezterm
-    
+    imv 
     stacer
     codeium
     ventoy-full
@@ -428,10 +447,7 @@
     gwenview
     jdk
     okular
-    oxygen
-    
-    
-    
+    oxygen 
     libsForQt5.kdenlive
     krita
     libsForQt5.kdeconnect-kde
@@ -442,7 +458,7 @@
     distrobox
     podman
     docker
-    apx
+    
     fnm
     bun
     kooha
@@ -453,6 +469,12 @@
     neovim
     emacs
     git
+    ripgrep
+    coreutils # basic GNU utilities
+    fd
+    clang
+  
+    ripgrep-all
     openssl
     postman
     # hyprland syspkg
@@ -491,6 +513,9 @@
     alsa-utils
     playerctl
     pavucontrol
+    hyprshade
+    ranger
+    lf
     zsh-powerlevel10k
     wlroots
     ffmpeg-full
@@ -504,7 +529,13 @@
     swaybg
     xdg-user-dirs
     linux-firmware
+    vimPlugins.nvim-treesitter-parsers.c
+    gcc_multi
     lxqt.lxqt-policykit 
+    mtpfs
+    android-file-transfer
+    go-mtpfs
+    pcmanfm
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
